@@ -11,8 +11,9 @@
     
     /* Размеры для Unscramble */
     --ch: clamp(32px, 8vw, 48px);
-    /* Размеры для Word Search */
-    --ws: calc((100vw - 40px) / 15);
+    
+    /* Размеры для Word Search: ограничиваем максимум 36px, чтобы не разрасталось на ПК */
+    --ws: clamp(18px, calc((100vw - 60px) / 15), 36px);
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{height:100%;margin:0;overflow:hidden;}
@@ -61,7 +62,7 @@
   .panel.active{display:flex;}
   .panel-title{font-size:clamp(16px,4vw,20px);font-weight:bold;color:#8b8ba8;text-align:center;}
 
-  /* Картинки (сильно увеличены) */
+  /* Картинки */
   .pic{display:block;margin:0 auto;object-fit:contain;max-width:100%;}
   .emoji-fb{display:flex !important;align-items:center;justify-content:center;line-height:1;}
   .sz-card{height:clamp(80px,16vh,140px);width:100%;}
@@ -185,20 +186,22 @@
   /* Wordsearch */
   .ws-grid{
     display:grid;gap:2px;background:#fff;padding:10px;border-radius:16px;
-    box-shadow:0 6px 0 #e6dcc9; width:100%; max-width:calc(15 * (var(--ws) + 4px));
+    box-shadow:0 6px 0 #e6dcc9; 
+    grid-template-columns: repeat(15, var(--ws)); /* Используем переменную с ограничением */
     margin: 0 auto;
   }
   .ws-cell{
-    width:100%; aspect-ratio:1;
+    width:var(--ws); height:var(--ws);
     display:flex;align-items:center;justify-content:center;
-    font-size:clamp(12px, 3.5vw, 22px);font-weight:bold;color:#4a4a6a;
-    border-radius:6px;cursor:pointer;text-transform:lowercase;
+    font-size:calc(var(--ws) * 0.55);font-weight:bold;color:#4a4a6a;
+    border-radius:4px;cursor:pointer;text-transform:lowercase;
+    transition: background 0.1s;
   }
   .ws-cell:hover{background:#f2f7ff;}
   .ws-cell.sel{background:var(--yellow);}
   .ws-cell.found{background:#a8e88c;color:#2f6b1f;}
   .ws-cell.wrong{background:#ffb3b3;animation:shake .3s;}
-  .ws-list{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:100%;}
+  .ws-list{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:min(900px, 100%); padding: 0 10px;}
   .ws-word{
     font-size:clamp(12px,3.5vw,16px);font-weight:bold;color:#6a6a8a;background:#fff;
     padding:4px 12px;border-radius:999px;box-shadow:0 3px 0 #e6dcc9;
@@ -856,7 +859,7 @@ function buildWS(){
 
 function renderWS(){
   const gridEl = $('wsGrid');
-  gridEl.style.gridTemplateColumns = 'repeat(' + WS_N + ', 1fr)';
+  // Убрали inline-стиль gridTemplateColumns, теперь он берется из CSS
   gridEl.innerHTML = '';
   for(let r=0;r<WS_N;r++){
     for(let c=0;c<WS_N;c++){
